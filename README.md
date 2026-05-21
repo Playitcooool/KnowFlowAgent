@@ -1,42 +1,39 @@
 # KnowFlow Agent
 
-KnowFlow Agent is an explainable enterprise knowledge QA system built around Markdown files, generated indexes, keyword query rewriting, parallel `ripgrep` retrieval, context expansion, evidence ranking, verification, and adaptive retry.
+KnowFlow Agent is an explainable enterprise knowledge QA system built around Markdown files, generated indexes, Pi SDK-backed agent stages, parallel `ripgrep` retrieval, context expansion, evidence ranking, verification, and adaptive retry.
 
-The implementation is filesystem-first and works without a vector database. LLM-style components are isolated as agents with deterministic defaults, so the project runs locally and can later be swapped to hosted model calls.
+The primary implementation is TypeScript/Node and uses `@earendil-works/pi-coding-agent` as the agent SDK. Agent stages fall back to deterministic local logic when no configured API key is available.
 
 ## Project Structure
 
 ```text
-app/
-  main.py                 FastAPI API
-  cli.py                  Command-line entrypoint
-  workflow.py             Adaptive query workflow
+src/
+  cli.ts                  Command-line entrypoint
+  server.ts               HTTP API
+  workflow.ts             Adaptive query workflow
+  piAgentClient.ts        Pi SDK adapter
   agents/                 Router, rewriter, answer, verifier
   retrieval/              Grep, context expansion, evidence ranking
   ingestion/              Conversion, metadata extraction, index builder
-  schemas/                Dataclass models
 knowledge_base/           Generated Markdown KB and indexes
 eval_set/                 Evaluation examples
-tests/                    Unit tests
 ```
 
 ## Install
 
 ```bash
-python3.13 -m venv .venv
-source .venv/bin/activate
-python -m pip install -U pip
-python -m pip install -e ".[dev,ingestion]"
+npm install
+npm run build
 ```
 
-`ripgrep` is recommended. If `rg` is unavailable, KnowFlow falls back to a Python searcher.
+`ripgrep` is recommended. If `rg` is unavailable, KnowFlow falls back to a Node-based Markdown searcher.
 
 ## Ingest Documents
 
 Place raw files under `data/raw/`, then run:
 
 ```bash
-knowflow ingest --raw-dir data/raw --markdown-dir data/markdown --kb-dir knowledge_base
+npm run dev -- ingest --raw-dir data/raw --markdown-dir data/markdown --kb-dir knowledge_base
 ```
 
 Supported inputs include Markdown, text, HTML, JSON, PDF, and DOCX. PDF and DOCX conversion use optional dependencies and fall back to an explanatory Markdown file if those dependencies are missing.
@@ -53,14 +50,15 @@ knowledge_base/<category>/<document>.md
 ## Ask Questions
 
 ```bash
-knowflow ask "Who approves travel reimbursement over 5000 yuan?"
-knowflow ask "How do new employees request GitHub repository access?" --json
+npm run dev -- ask "Who approves travel reimbursement over 5000 yuan?"
+npm run dev -- ask "How do new employees request GitHub repository access?" --json
 ```
 
 ## Run API
 
 ```bash
-uvicorn app.main:app --reload
+npm run build
+node -e 'import("./dist/server.js").then(({ createServer }) => createServer().listen(8000))'
 ```
 
 Endpoints:
@@ -78,10 +76,10 @@ Implemented MVP components:
 - Metadata extraction and multi-label categorization
 - Root and folder-level index generation
 - Manifest generation
-- Query router and file router
-- Query rewriting
+- Pi SDK-backed query router and file router
+- Pi SDK-backed query rewriting
 - Parallel grep/ripgrep retrieval
 - Context expansion with line numbers
 - Evidence ranking and deduplication
-- Grounded answers with file-line citations
-- Evidence verification and adaptive retry
+- Pi SDK-backed grounded answers with file-line citations
+- Pi SDK-backed evidence verification and adaptive retry

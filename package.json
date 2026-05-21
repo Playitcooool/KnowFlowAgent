@@ -1,0 +1,31 @@
+{
+  "name": "knowflow-agent",
+  "version": "0.2.0",
+  "description": "Explainable Markdown-based enterprise knowledge QA agent powered by Pi SDK.",
+  "type": "module",
+  "bin": {
+    "knowflow": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "dev": "tsx src/cli.ts",
+    "serve": "node -e 'import(\"./dist/server.js\").then(({ createServer }) => createServer().listen(8000))'",
+    "start": "node dist/cli.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@earendil-works/pi-ai": "^0.74.0",
+    "@earendil-works/pi-coding-agent": "^0.74.0",
+    "fast-glob": "^3.3.3",
+    "yaml": "^2.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
+  }
+}
