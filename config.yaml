@@ -7,9 +7,9 @@ providers:
 
   anthropic:
     type: anthropic
-    api_key_env: ANTHROPIC_API_KEY
-    base_url: https://api.anthropic.com
-    default_model: claude-3-5-sonnet-latest
+    api_key_env: ANTHROPIC_AUTH_TOKEN
+    base_url: https://api.deepseek.com/anthropic
+    default_model: deepseek-v4-flash
 
   custom_openai_compatible:
     type: openai_compatible
@@ -18,6 +18,6 @@ providers:
     default_model: your-model-name
 
 runtime:
-  default_provider: openai
+  default_provider: anthropic
   timeout_seconds: 60
   max_retries: 3
