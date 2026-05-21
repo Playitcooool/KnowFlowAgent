@@ -1,0 +1,23 @@
+providers:
+  openai:
+    type: openai_compatible
+    api_key_env: OPENAI_API_KEY
+    base_url: https://api.openai.com/v1
+    default_model: gpt-4.1
+
+  anthropic:
+    type: anthropic
+    api_key_env: ANTHROPIC_API_KEY
+    base_url: https://api.anthropic.com
+    default_model: claude-3-5-sonnet-latest
+
+  custom_openai_compatible:
+    type: openai_compatible
+    api_key_env: CUSTOM_LLM_API_KEY
+    base_url: https://your-provider.example.com/v1
+    default_model: your-model-name
+
+runtime:
+  default_provider: openai
+  timeout_seconds: 60
+  max_retries: 3
