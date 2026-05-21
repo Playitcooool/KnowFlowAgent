@@ -1,0 +1,8 @@
+[
+  {
+    "question": "Who approves travel reimbursement over 5000 yuan?",
+    "expected_files": ["finance/reimbursement_policy.md"],
+    "expected_answer_keywords": ["department manager", "finance manager", "approval"]
+  }
+]
+
