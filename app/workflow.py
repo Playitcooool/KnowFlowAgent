@@ -25,7 +25,7 @@ class KnowFlowWorkflow:
         manifest = load_manifest(self.knowledge_base_dir)
         query_router = QueryRouter(self.knowledge_base_dir, manifest)
         file_router = FileRouter(self.knowledge_base_dir, manifest)
-        rewriter = QueryRewriter()
+        rewriter = QueryRewriter(self.knowledge_base_dir, manifest)
         retriever = GrepRetriever(self.knowledge_base_dir)
         context_reader = ContextReader(self.knowledge_base_dir)
         ranker = EvidenceRanker(manifest)
@@ -39,7 +39,12 @@ class KnowFlowWorkflow:
             route = query_router.route(query, retry_level=retry_level)
             target_files = file_router.route(query, route.target_dirs, retry_level=retry_level)
             targets = self._targets(route.target_dirs, target_files, retry_level)
-            rewritten_queries = rewriter.rewrite(query, n=5 if retry_level < 3 else 8, retry_level=retry_level)
+            rewritten_queries = rewriter.rewrite(
+                query,
+                target_dirs=route.target_dirs,
+                n=5 if retry_level < 3 else 8,
+                retry_level=retry_level,
+            )
 
             hits = await retriever.search(
                 queries=rewritten_queries,
@@ -94,4 +99,3 @@ class KnowFlowWorkflow:
             return existing_files
         dirs = [self.knowledge_base_dir / directory for directory in target_dirs]
         return [path for path in dirs if path.exists()] or [self.knowledge_base_dir]
-
