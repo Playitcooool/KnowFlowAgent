@@ -5,3 +5,5 @@ __pycache__/
 data/raw/
 data/markdown/
 config.yaml
+.DS_Store
+knowledge_base/

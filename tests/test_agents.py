@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 
 from app.agents.query_rewriter import QueryRewriter
@@ -39,7 +40,7 @@ def test_query_router_uses_root_index_items_as_folder_candidates(tmp_path: Path)
         ]
     )
 
-    route = QueryRouter(kb, manifest).route("How are payroll approvals handled?")
+    route = asyncio.run(QueryRouter(kb, manifest).route("How are payroll approvals handled?"))
 
     assert route.target_dirs == ["finance"]
     assert "root index" in route.reason
@@ -59,10 +60,12 @@ def test_query_rewriter_expands_from_manifest_context_not_static_synonyms() -> N
         ]
     )
 
-    queries = QueryRewriter(manifest=manifest).rewrite(
-        "Who approves travel spending?",
-        target_dirs=["finance"],
-        n=5,
+    queries = asyncio.run(
+        QueryRewriter(manifest=manifest).rewrite(
+            "Who approves travel spending?",
+            target_dirs=["finance"],
+            n=5,
+        )
     )
 
     assert queries[0] == "Who approves travel spending?"

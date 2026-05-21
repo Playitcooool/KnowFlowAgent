@@ -14,7 +14,7 @@ app/
   agents/                 Router, rewriter, answer, verifier
   retrieval/              Grep, context expansion, evidence ranking
   ingestion/              Conversion, metadata extraction, index builder
-  schemas/                Pydantic models
+  schemas/                Dataclass models
 knowledge_base/           Generated Markdown KB and indexes
 eval_set/                 Evaluation examples
 tests/                    Unit tests
@@ -23,9 +23,10 @@ tests/                    Unit tests
 ## Install
 
 ```bash
-python -m venv .venv
+python3.13 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev,ingestion]"
+python -m pip install -U pip
+python -m pip install -e ".[dev,ingestion]"
 ```
 
 `ripgrep` is recommended. If `rg` is unavailable, KnowFlow falls back to a Python searcher.
@@ -84,4 +85,3 @@ Implemented MVP components:
 - Evidence ranking and deduplication
 - Grounded answers with file-line citations
 - Evidence verification and adaptive retry
-

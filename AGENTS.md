@@ -14,7 +14,7 @@ KnowFlow Agent is a filesystem-first, explainable enterprise QA system. It conve
 
 ## Engineering Conventions
 
-- Use Python 3.11+ and keep dependencies aligned with `pyproject.toml`.
+- Use Python 3.13+ and keep dependencies aligned with `pyproject.toml`.
 - Prefer deterministic, local behavior. LLM-like components currently use simple heuristics and should remain swappable behind small classes.
 - Preserve line-level traceability. Retrieval and answers should keep file paths and line ranges stable.
 - Keep generated knowledge-base files plain Markdown or JSON.
@@ -33,4 +33,3 @@ KnowFlow Agent is a filesystem-first, explainable enterprise QA system. It conve
 - `knowflow_agent_design.md`: architecture and design rationale.
 - `pyproject.toml`: package metadata, dependencies, console script, pytest config.
 - `config.yaml`: provider API-key configuration template; do not hardcode real secrets.
-

@@ -1,6 +1,7 @@
 # Agents Package Guide
 
 `app/agents/` contains small, swappable decision components used by `KnowFlowWorkflow`.
+Each agent accepts the shared configured LLM client loaded from `config.yaml` and falls back to deterministic logic when no API key is available.
 
 ## Components
 
@@ -13,6 +14,7 @@
 ## Local Rules
 
 - Keep these classes deterministic by default. If a hosted model is added later, hide it behind the same class boundary or a clearly named adapter.
+- When an agent needs model reasoning, use the `LLMClient` passed by the workflow instead of reading environment variables directly.
 - Folder routing should follow the root `index.md` items. Do not silently route to arbitrary directories that are not represented in the root index except as an empty-KB fallback.
 - Preserve retry-aware behavior. Broader search should happen at higher retry levels, not by making first-pass routing indiscriminate.
 - Query rewriting should be handled by the rewriter using available KB context, not hardcoded domain synonym maps.

@@ -4,6 +4,7 @@ import asyncio
 from pathlib import Path
 
 from app.config import Settings
+from app.ingestion.converter import DocumentConverter
 from app.ingestion.index_builder import IndexBuilder
 from app.workflow import KnowFlowWorkflow
 
@@ -38,3 +39,12 @@ Employees must submit invoices before the monthly deadline.
     assert answer.citations
     assert answer.trace
 
+
+def test_markdown_converter_allows_same_source_and_output_path(tmp_path: Path) -> None:
+    markdown_file = tmp_path / "policy.md"
+    markdown_file.write_text("# Policy\n\nUse the existing Markdown file.\n", encoding="utf-8")
+
+    outputs = DocumentConverter().convert_directory(tmp_path, tmp_path)
+
+    assert outputs == [markdown_file]
+    assert markdown_file.read_text(encoding="utf-8").startswith("# Policy")

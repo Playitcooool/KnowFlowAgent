@@ -30,7 +30,8 @@ class DocumentConverter:
         output.parent.mkdir(parents=True, exist_ok=True)
         suffix = source.suffix.lower()
         if suffix == ".md":
-            shutil.copyfile(source, output)
+            if source.resolve() != output.resolve():
+                shutil.copyfile(source, output)
         elif suffix in {".txt", ".rst"}:
             output.write_text(source.read_text(encoding="utf-8", errors="replace"), encoding="utf-8")
         elif suffix in {".html", ".htm"}:
@@ -87,4 +88,3 @@ class DocumentConverter:
             return "\n\n".join(lines) + "\n"
         except Exception as exc:
             return f"# {source.stem.replace('_', ' ').title()}\n\nDOCX conversion unavailable: {exc}\n"
-

@@ -9,6 +9,7 @@ from app.agents.query_router import QueryRouter
 from app.agents.verifier import VerifierAgent
 from app.config import Settings
 from app.ingestion.index_builder import load_manifest
+from app.llm import load_llm_client
 from app.retrieval.context_reader import ContextReader
 from app.retrieval.evidence_ranker import EvidenceRanker
 from app.retrieval.grep_retriever import GrepRetriever
@@ -23,23 +24,24 @@ class KnowFlowWorkflow:
 
     async def answer_query(self, query: str) -> Answer:
         manifest = load_manifest(self.knowledge_base_dir)
-        query_router = QueryRouter(self.knowledge_base_dir, manifest)
-        file_router = FileRouter(self.knowledge_base_dir, manifest)
-        rewriter = QueryRewriter(self.knowledge_base_dir, manifest)
+        llm = load_llm_client(self.settings.llm_config_path)
+        query_router = QueryRouter(self.knowledge_base_dir, manifest, llm=llm)
+        file_router = FileRouter(self.knowledge_base_dir, manifest, llm=llm)
+        rewriter = QueryRewriter(self.knowledge_base_dir, manifest, llm=llm)
         retriever = GrepRetriever(self.knowledge_base_dir)
         context_reader = ContextReader(self.knowledge_base_dir)
         ranker = EvidenceRanker(manifest)
-        answer_agent = AnswerAgent()
-        verifier = VerifierAgent()
+        answer_agent = AnswerAgent(llm=llm)
+        verifier = VerifierAgent(llm=llm)
 
         trace: list[SearchTrace] = []
         best_answer: Answer | None = None
 
         for retry_level in range(1, self.settings.max_retry + 1):
-            route = query_router.route(query, retry_level=retry_level)
-            target_files = file_router.route(query, route.target_dirs, retry_level=retry_level)
+            route = await query_router.route(query, retry_level=retry_level)
+            target_files = await file_router.route(query, route.target_dirs, retry_level=retry_level)
             targets = self._targets(route.target_dirs, target_files, retry_level)
-            rewritten_queries = rewriter.rewrite(
+            rewritten_queries = await rewriter.rewrite(
                 query,
                 target_dirs=route.target_dirs,
                 n=5 if retry_level < 3 else 8,
@@ -65,8 +67,8 @@ class KnowFlowWorkflow:
                 )
             )
 
-            answer = answer_agent.generate(query, evidence, trace.copy())
-            verification = verifier.verify(query, answer, evidence)
+            answer = await answer_agent.generate(query, evidence, trace.copy())
+            verification = await verifier.verify(query, answer, evidence)
             answer = answer.model_copy(
                 update={
                     "confidence": verification.confidence,
